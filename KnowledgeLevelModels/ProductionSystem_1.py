@@ -1,49 +1,87 @@
 
 import random
-     
-# create the ProductionCycle class ###########################################################################
 
+class Utility: # this class provides utility functions for matching and choosing chunks
+    
+    @staticmethod
+    def check_match(key, value, target_dict, wildcard='*'):
+        """
+        Check if a single key-value pair matches in the target dictionary.
 
-class ProductionCycle:
-    def __init__(self):
-        self.pending_actions = []
+        This will be used below in 'check_positive_matches' and 'check_negative_matches'
 
+        Args:
+            key (str): The key to look for in the target dictionary.
+            value (str): The value to match against the value in the target dictionary.
+            target_dict (dict): The dictionary to search in.
+            wildcard (str, optional): A special character used to indicate any value is acceptable. Defaults to '*'.
 
-    # buffer_match_eval checks if a cue chunk matches any chunks in a given buffer.
-    # It considers both positive matches (what should be there) and negations (what should not be there).
-    # buffer_dict is the target buffer
-    # matching_dict and negation_dict and wildcard specifie the cue
-    # these functions are needed by buffer_match_eval
-
-    # Check if a single key-value pair matches in the target dictionary
-    def check_match(self, key, value, target_dict, wildcard='*'):
+        Returns:
+            bool: True if the key exists in the dictionary and the corresponding value matches, False otherwise.
+        """
         return key in target_dict and (value == wildcard or target_dict[key] == value)
 
-    # Check all positive matches in the matching dictionary against the buffer
-    def check_positive_matches(self, buffer_dict, matching_dict, wildcard='*'):
-        return all(self.check_match(key, value, buffer_dict, wildcard) for key, value in matching_dict.items())
+    @staticmethod
+    def check_positive_matches(buffer_dict, matching_dict, wildcard='*'):
+        """
+        Check if all key-value pairs in the matching dictionary are found in the buffer dictionary.
 
-    # Check all negations in the negation dictionary against the buffer
-    def check_negative_matches(self, buffer_dict, negation_dict):
-        return not any(self.check_match(key, value, buffer_dict) for key, value in negation_dict.items())
+        Args:
+            buffer_dict (dict): The buffer dictionary where matches are looked for.
+            matching_dict (dict): The dictionary containing key-value pairs to match.
+            wildcard (str, optional): A character that represents any value. Defaults to '*'.
 
-    # Evaluate if a buffer matches given positive and negative conditions
-    def buffer_match_eval(self, buffer_dict, matching_dict, negation_dict, wildcard='*'):
-        return self.check_positive_matches(buffer_dict, matching_dict, wildcard) and self.check_negative_matches(buffer_dict, negation_dict)
+        Returns:
+            bool: True if all key-value pairs match, False otherwise.
+        """
+        return all(Utility.check_match(key, value, buffer_dict, wildcard) for key, value in matching_dict.items())
 
-##    # buffer_match_eval
-##    def buffer_match_eval(self, buffer_dict, matching_dict, negation_dict, wildcard='*'):
-##        """Evaluate if a buffer matches given positive and negative conditions."""
-##        return self.check_positive_matches(buffer_dict, matching_dict, wildcard) and self.check_negative_matches(buffer_dict, negation_dict)
+    @staticmethod
+    def check_negative_matches(buffer_dict, negation_dict):
+        """
+        Check if none of the key-value pairs in the negation dictionary are found in the buffer dictionary.
 
+        Args:
+            buffer_dict (dict): The buffer dictionary where matches are checked.
+            negation_dict (dict): The dictionary containing key-value pairs that should not match.
 
-    # This function selects a production with the highest utility from a list of matching productions.
-    def find_max(self, match_list):
+        Returns:
+            bool: True if none of the key-value pairs are found in the buffer dictionary, False otherwise.
+        """
+        return not any(Utility.check_match(key, value, buffer_dict) for key, value in negation_dict.items())
+
+    @staticmethod
+    def buffer_match_eval(buffer_dict, matching_dict, negation_dict, wildcard='*'):
+        """
+        Evaluate if a buffer matches given positive and negative conditions.
+
+        Args:
+            buffer_dict (dict): The buffer dictionary to evaluate.
+            matching_dict (dict): The dictionary of conditions that should match.
+            negation_dict (dict): The dictionary of conditions that should not match.
+            wildcard (str, optional): A character that represents any value. Defaults to '*'.
+
+        Returns:
+            bool: True if the buffer matches all positive conditions and none of the negative conditions, False otherwise.
+        """
+        return Utility.check_positive_matches(buffer_dict, matching_dict, wildcard) and Utility.check_negative_matches(buffer_dict, negation_dict)
+
+    @staticmethod
+    def find_max(match_list):
+        """
+        Selects the item with the highest utility from a list of items.
+
+        Args:
+            match_list (list): A list of items where each item is a dictionary containing at least a 'utility' key.
+
+        Returns:
+            dict: The item with the highest utility. If there are multiple items with the same highest utility,
+            one of them is returned randomly. Returns None if the list is empty or no items have a utility value.
+        """
         highest_utility = float('-inf')
         highest_utility_productions = []
         for item in match_list:
             utility = item.get('utility', float('-inf'))  # Retrieve the utility of the production.
-            # Update the list of highest utility productions based on the current production's utility.
             if utility > highest_utility:
                 highest_utility = utility
                 highest_utility_productions = [item]
@@ -52,21 +90,22 @@ class ProductionCycle:
         # Randomly choose one production if there are multiple productions with the highest utility.
         return random.choice(highest_utility_productions) if highest_utility_productions else None
 
+    
 
-
+class ProductionCycle: # This class runs the production cycle
+    def __init__(self):
+        self.pending_actions = []
 
     def match_productions(self, working_memory, AllProductionSystems):
         """Finds and groups matched productions."""
-        grouped_matched_productions = {key: [] for key in AllProductionSystems}  # Initialize the dictionary
+        grouped_matched_productions = {key: [] for key in AllProductionSystems}
 
-        # Decrease the delay for each production system and check for matches.
         for prod_system_key, prod_system_value in AllProductionSystems.items():
             if prod_system_value[1] > 0:
                 prod_system_value[1] -= 1
 
-
-            prod_system = prod_system_value[0]  # List of production rules.
-            delay = prod_system_value[1]  # Current delay for the system.
+            prod_system = prod_system_value[0]
+            delay = prod_system_value[1]
 
             if delay > 0:
                 continue
@@ -76,7 +115,7 @@ class ProductionCycle:
                 for buffer_key in production['matches'].keys():
                     matches = production['matches'].get(buffer_key, {})
                     negations = production['negations'].get(buffer_key, {})
-                    if not self.buffer_match_eval(working_memory.get(buffer_key, {}), matches, negations):
+                    if not Utility.buffer_match_eval(working_memory.get(buffer_key, {}), matches, negations):
                         is_match_for_all_buffers = False
                         break
 
@@ -86,7 +125,6 @@ class ProductionCycle:
                     print(f"Matched Production in {prod_system_key}: {production.get('report')}")
 
         return grouped_matched_productions
-
 
 
     def process_pending_actions(self, working_memory, AllProductionSystems, DelayResetValues):
@@ -125,8 +163,9 @@ class ProductionCycle:
                 self.pending_actions[i] = (prod_system_key, production, delay - 1)
                 print(f'[INFO] Delay for action in production {production.get("report")} decremented. Remaining delay: {delay - 1}')
 
-
     
+        
+
     def filter_and_execute_productions(self, grouped_productions, working_memory, AllProductionSystems, DelayResetValues):
         """
         Selects the production with the highest utility matched production for each production system.
@@ -141,8 +180,8 @@ class ProductionCycle:
             DelayResetValues (dict): Dictionary containing the original delays for each production system.
         """
         for prod_system_key, productions in grouped_productions.items():
+            highest_utility_production = Utility.find_max(productions)
             # Find the production with the highest utility in the current production system
-            highest_utility_production = self.find_max(productions)
             
             if highest_utility_production:
                 # Reporting the selected production

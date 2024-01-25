@@ -7,15 +7,12 @@ class Utility: # this class provides utility functions for matching and choosing
     def check_match(key, value, target_dict, wildcard='*'):
         """
         Check if a single key-value pair matches in the target dictionary.
-
         This will be used below in 'check_positive_matches' and 'check_negative_matches'
-
         Args:
             key (str): The key to look for in the target dictionary.
             value (str): The value to match against the value in the target dictionary.
             target_dict (dict): The dictionary to search in.
             wildcard (str, optional): A special character used to indicate any value is acceptable. Defaults to '*'.
-
         Returns:
             bool: True if the key exists in the dictionary and the corresponding value matches, False otherwise.
         """
@@ -25,12 +22,10 @@ class Utility: # this class provides utility functions for matching and choosing
     def check_positive_matches(buffer_dict, matching_dict, wildcard='*'):
         """
         Check if all key-value pairs in the matching dictionary are found in the buffer dictionary.
-
         Args:
             buffer_dict (dict): The buffer dictionary where matches are looked for.
             matching_dict (dict): The dictionary containing key-value pairs to match.
             wildcard (str, optional): A character that represents any value. Defaults to '*'.
-
         Returns:
             bool: True if all key-value pairs match, False otherwise.
         """
@@ -40,11 +35,9 @@ class Utility: # this class provides utility functions for matching and choosing
     def check_negative_matches(buffer_dict, negation_dict):
         """
         Check if none of the key-value pairs in the negation dictionary are found in the buffer dictionary.
-
         Args:
             buffer_dict (dict): The buffer dictionary where matches are checked.
             negation_dict (dict): The dictionary containing key-value pairs that should not match.
-
         Returns:
             bool: True if none of the key-value pairs are found in the buffer dictionary, False otherwise.
         """
@@ -54,13 +47,11 @@ class Utility: # this class provides utility functions for matching and choosing
     def buffer_match_eval(buffer_dict, matching_dict, negation_dict, wildcard='*'):
         """
         Evaluate if a buffer matches given positive and negative conditions.
-
         Args:
             buffer_dict (dict): The buffer dictionary to evaluate.
             matching_dict (dict): The dictionary of conditions that should match.
             negation_dict (dict): The dictionary of conditions that should not match.
             wildcard (str, optional): A character that represents any value. Defaults to '*'.
-
         Returns:
             bool: True if the buffer matches all positive conditions and none of the negative conditions, False otherwise.
         """
@@ -70,10 +61,8 @@ class Utility: # this class provides utility functions for matching and choosing
     def find_max(match_list):
         """
         Selects the item with the highest utility from a list of items.
-
         Args:
             match_list (list): A list of items where each item is a dictionary containing at least a 'utility' key.
-
         Returns:
             dict: The item with the highest utility. If there are multiple items with the same highest utility,
             one of them is returned randomly. Returns None if the list is empty or no items have a utility value.
@@ -90,7 +79,81 @@ class Utility: # this class provides utility functions for matching and choosing
         # Randomly choose one production if there are multiple productions with the highest utility.
         return random.choice(highest_utility_productions) if highest_utility_productions else None
 
-    
+    @staticmethod
+    # Enhanced buffer match evaluation function with diagnostics.
+    def buffer_match_eval_diagnostic(buffer_dict, matching_dict, negation_dict, wildcard='*'):
+        # Display diagnostic information
+        print(f"\nEvaluating buffer: {buffer_dict}")
+        print(f"Against matching criteria: {matching_dict} and negation criteria: {negation_dict}")
+
+        # Initialize a dictionary to capture wildcard values
+        wildcard_values = {}
+        # Iterate over matching conditions
+        for key, match_value in matching_dict.items():
+            # Handle wildcard values
+            if match_value == wildcard:
+                print(f"Wildcard for key: {key}, any value is acceptable.")
+                wildcard_values[key] = buffer_dict.get(key, None)  # Capture the actual value from the buffer
+                continue
+            # Check for a match
+            print(f"Checking match for key: {key} with value: {match_value}")
+            if key not in buffer_dict or buffer_dict[key] != match_value:
+                print("Match failed!")
+                return False, {}
+            print("Match succeeded!")
+
+        # Iterate over negation conditions
+        for key, neg_value in negation_dict.items():
+            # Check for negation
+            print(f"Checking negation for key: {key} with value: {neg_value}")
+            if key in buffer_dict and buffer_dict[key] == neg_value:
+                print("Negation failed!")
+                return False, {}
+            print("Negation succeeded!")
+
+        print("Buffer item passed all criteria.")
+        # Return both the result and the captured wildcard values
+        return True, wildcard_values
+
+    @staticmethod
+    # Function to match chunks in a buffer with given cues, considering diagnostics.
+    def match_chunks_with_diagnostics(buffer, cue):
+        matched_chunks_data = []  # Store matched chunks
+        # Iterate over each buffer item
+        for buffer_key, buffer_value in buffer.items():
+            print(f"\nProcessing buffer item: {buffer_key}")
+            # Evaluate buffer item against matching and negation criteria
+            match, wildcard_values = Utility.buffer_match_eval_diagnostic(buffer_value, cue['matches'], cue['negations'])
+            if match:
+                matched_chunk_data = buffer_value.copy()  # Copy matching chunk data
+                matched_chunk_data.update(wildcard_values)  # Include wildcard values
+                matched_chunks_data.append(matched_chunk_data)  # Add to the list of matched chunks
+                print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
+
+        # Select the best chunk based on utility
+        best_chunk_data = Utility.find_max(matched_chunks_data)
+        return best_chunk_data
+
+    @staticmethod
+    def delete_chunk_from_dict(dictionary, chunk_key):
+        """
+        Deletes a chunk from a given dictionary based on the provided chunk key.
+
+        Args:
+            dictionary (dict): The dictionary from which the chunk will be deleted.
+            chunk_key (str): The key of the chunk to be deleted.
+
+        Returns:
+            bool: True if the chunk was successfully deleted, False if the chunk was not found.
+        """
+        if chunk_key in dictionary:
+            del dictionary[chunk_key]
+            print(f"Chunk '{chunk_key}' deleted from the dictionary.")
+            return True
+        else:
+            print(f"Chunk '{chunk_key}' not found in the dictionary.")
+            return False
+
 
 class ProductionCycle: # This class runs the production cycle
     def __init__(self):
@@ -229,7 +292,36 @@ PS1_list = []
 def action_test_ProductionSystem1(working_memory):
     working_memory['buffer2']['test'] = 'two'
     working_memory['buffer1']['animal'] = working_memory['buffer2']['number']
+##### match chunk  
+    cue = {
+    'matches': {'animal': 'cat', 'colour': '*', 'name': '*'},
+    'negations': {}
+}
+    BufferName = DM
+    best_chunk_data = Utility.match_chunks_with_diagnostics(BufferName, cue)
+
+
+
+def action_test_ProductionSystem1(working_memory):
+    # Existing logic
+    working_memory['buffer2']['test'] = 'two'
+    working_memory['buffer1']['animal'] = working_memory['buffer2']['number']
+    
+    # Diagnostic match to find the best chunk
+    cue = {
+        'matches': {'animal': 'cat', 'colour': '*', 'name': '*'},
+        'negations': {}
+    }
+    BufferName = DM
+    best_chunk_data = Utility.match_chunks_with_diagnostics(BufferName, cue)
+    
+    # Check if a valid chunk was found and then update buffer2
+    if best_chunk_data:
+        working_memory['buffer2'] = best_chunk_data
+        print(f"Updated buffer2 with best chunk data: {best_chunk_data}")
+    
     return 0
+
 PS1_list.append({
     'matches': {'buffer1': {'animal': 'cat', 'colour': 'brown'}, 'buffer2': {'test': 'one'}},
     'negations': {},
@@ -237,6 +329,9 @@ PS1_list.append({
     'action': action_test_ProductionSystem1,
     'report': "PS1-Production1"
 })
+
+
+
 
 
 def action_test_ProductionSystem2(working_memory):
@@ -324,15 +419,15 @@ PS1_list.append({
 PS2_list = []
 
 
-def action_test_ProductionSystem1b(working_memory):
+def action_test_ProductionSystem2a(working_memory):
     working_memory['buffer4']['fish'] = 'salmon'
     return 0
 PS2_list.append({
-    'matches': {'buffer4': {'fish': 'tuna'}},
+    'matches': {'buffer2': {'fish': 'tuna'}},
     'negations': {},
     'utility': 10,
-    'action': action_test_ProductionSystem1b,
-    'report': "PS2-Production1"
+    'action': action_test_ProductionSystem2a,
+    'report': "ProductionSystem2a"
 })
 
 
@@ -340,11 +435,11 @@ def action_test_ProductionSystem2b(working_memory):
     working_memory['buffer4']['fish'] = 'shark'
     return 3
 PS2_list.append({
-    'matches': {'buffer4': {'fish': 'salmon'}},
+    'matches': {'buffer2': {'animal': 'cat'}},
     'negations': {},
     'utility': 10,
     'action': action_test_ProductionSystem2b,
-    'report': "PS2-Production2"
+    'report': "ProductionSystem2b - matched to animal cat in buffer 2"
 })
 
 
@@ -358,7 +453,11 @@ working_memory = {
     'buffer4': {'fish': 'tuna'}
 }
 
-
+DM = {
+    'chunk1': {'animal': 'cat', 'colour': 'brown', 'utility': 25},
+    'chunk2': {'animal': 'cat', 'colour': 'white', 'name': 'whitney', 'utility': 30},
+    'chunk3': {'animal': 'fish', 'colour': 'blue', 'utility': 15}
+    }
 
 # production system delays in ticks
 ProductionSystem1_Countdown=1

@@ -9,8 +9,9 @@ PythonCMC is primarily meant as a teaching tool. In the future there may be diff
   * This works by using production rules to alter and/or move *chunks* between *memories*.
   * In terms of Python code:
     * Chunks are dictionaries expressing propositional knowledge and containing a utility value
-    * Memories are lists of chunk dictionaries
+    * Memories are dictionaries of chunk dictionaries
     * Production rules are dictionaries that contain a chunk for matching to and an action
+    * Production systems are lists of production rules 
   * Production rules have the following basic functions:
     * chunk matching
     * chunk copying

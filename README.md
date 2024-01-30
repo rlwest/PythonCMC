@@ -1,7 +1,7 @@
 # PythonCMC
 ## Python Common Model of Cognition Project
 ### The goal of this project is to create a computational architecture that can be used to implement cognitive architectures consistent with the Common Model of Cognition
-PythonCMC is primarily meant as a teaching tool. In the future there may be different versions but, for now, the focus is on creating a very simple version, so that students can easily see how it works.
+PythonCMC is primarily meant as a teaching tool. In the future there may be different versions but, for now, the focus is on creating a very simple version, so that students can easily see how it works. In service of this, this version of PythonCMC focuses on using ACT-R type chunks and basic production systems. It should be noted that CMC architectures are not restricted to this sort of computational implementation.
 PythonCMC breaks down cognitive models into three levels
 1. **The computational architecture**
   * The computational architecture allows agents to *think*, to *percieve* an environment, and *act* in the environment.

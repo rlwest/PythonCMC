@@ -28,3 +28,4 @@ PythonCMC is primarily meant as a teaching tool. In the future there may be diff
 3. **The cognitive model**
    * the cognitive model is produced in the normal way, by adding specific chunks and production rules to the cognitive architecture
    * examples will be added
+     * ACT1d.py begins to add ACT-R ish functionality to the PyCMC compuational architecture (PyCMC remains the same)

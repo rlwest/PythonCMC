@@ -305,6 +305,8 @@ class ProductionCycle: # This class runs the production cycle
 ## it will put the best match in DMbuffer
 ## if there is no match it will put 'process': 'failed' in the DMbuffer
 
+## it will also change 'process': 'DMretrieve' to 'process': 'DMrequested' in the goalbuffer
+
 
 class DMHandler:
     def __init__(self, dm):

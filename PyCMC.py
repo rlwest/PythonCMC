@@ -290,19 +290,6 @@ PS1_list = []
 
 
 def action_test_ProductionSystem1(working_memory):
-    working_memory['buffer2']['test'] = 'two'
-    working_memory['buffer1']['animal'] = working_memory['buffer2']['number']
-##### match chunk  
-    cue = {
-    'matches': {'animal': 'cat', 'colour': '*', 'name': '*'},
-    'negations': {}
-}
-    BufferName = DM
-    best_chunk_data = Utility.match_chunks_with_diagnostics(BufferName, cue)
-
-
-
-def action_test_ProductionSystem1(working_memory):
     # Existing logic
     working_memory['buffer2']['test'] = 'two'
     working_memory['buffer1']['animal'] = working_memory['buffer2']['number']

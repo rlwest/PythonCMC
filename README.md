@@ -23,14 +23,13 @@ PythonCMC is primarily meant as a teaching tool. In the future there may be diff
     *  The only thing the choice of computational architecture implies is that it is sufficient to create a version of the cognitive architecture that is sufficient to model the task in question
 2. **The cognitive architecture and model**
   * Usually the cognitive architecture and the computational architecture are combined so that the modeler just creates the model
-  * This has the advantage of making clear that the cognitive architecture is fixed and that the model represents different knowledge configurations expressed as Declarative Memory chunks and Procedural Memory production rules
+  * This has the advantage of making clear that the cognitive architecture is fixed and that the model represents different knowledge configurations expressed as Declarative Memory chunks and Procedural Memory production rules, due to the computational architecture in this case
+  * In this system the cognitive architecture is created by creating a cognitive model
+  * This is done by adding in all the modules, connections between modules, and functionality assumed by the architecture, in the model
   * The cognitive architecture is built in the following way:
     1. create specific memories and production systems
     2. (optional) create additional functionality by building it into a production system
        * This is where this way of creating cognitive architectures is somewhat different. In the computational architecture, production systems do double duty. As in most cognitive models, they are used to model functionality that is believed to map onto actual neural systems that match and choose. PythonCMC also uses produciton systems in this way, to represent real cognitive activity. However, PythonCMC also uses production systems as (1) a way to to model the actions of modules and (2) a way to integrate sub symbolic processing into the architecture (so, triple duty, actually).
        * This is a coding trade off. Arguably, it makes the cognitive architecture less discernable in the code because produciton systems are used all over the place. However, it also makes the compuational architecture much simpler and easier to understand. This fits with the goals of this project, to have a computational architecture that is seperate and not optimized for any particular cognitive architecture, but rather for a class of cognitive architectures.
        * So, as in all cognitive architecture, but maybe particularly in Python CMC, it is important to add commenting to your code to make clear what is what. However, once a cognitive architecture is defined, it can be put in a sepperate bit of code and imported into PythonCMC so that these complications are hidden.
-       * examples will be added
-  * The cognitive model
-    * the cognitive model is produced in the normal way, by adding specific chunks and production rules to the cognitive architecture
- 
+     

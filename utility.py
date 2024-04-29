@@ -63,6 +63,8 @@ class Utility: # this class provides utility functions for matching and choosing
         """
         return Utility.check_positive_matches(buffer_dict, matching_dict, wildcard) and Utility.check_negative_matches(buffer_dict, negation_dict)
 
+
+
     @staticmethod
     def find_max(match_list):
         """
@@ -71,19 +73,23 @@ class Utility: # this class provides utility functions for matching and choosing
             match_list (list): A list of items where each item is a dictionary containing at least a 'utility' key.
         Returns:
             dict: The item with the highest utility. If there are multiple items with the same highest utility,
-            one of them is returned randomly. Returns None if the list is empty or no items have a utility value.
+            one of them is returned randomly. Returns None if the input list is empty.
         """
-        highest_utility = float('-inf')
-        highest_utility_productions = []
-        for item in match_list:
-            utility = item.get('utility', float('-inf'))  # Retrieve the utility of the production.
-            if utility > highest_utility:
-                highest_utility = utility
-                highest_utility_productions = [item]
-            elif utility == highest_utility:
-                highest_utility_productions.append(item)
-        # Randomly choose one production if there are multiple productions with the highest utility.
-        return random.choice(highest_utility_productions) if highest_utility_productions else None
+        if not match_list:
+            return None  # Return None if the input list is empty
+
+        # Filter out items without the 'utility' key
+        items_with_utility = [item for item in match_list if 'utility' in item]
+
+        if not items_with_utility:
+            return random.choice(match_list)  # Return a random choice from the original input list
+
+        highest_utility = max(items_with_utility, key=lambda item: item['utility'])['utility']
+        highest_utility_productions = [item for item in items_with_utility if item['utility'] == highest_utility]
+
+        return random.choice(highest_utility_productions)
+
+
 
     @staticmethod
     # Enhanced buffer match evaluation function with diagnostics.

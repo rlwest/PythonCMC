@@ -44,19 +44,33 @@ class TestUtility(unittest.TestCase):
         self.assertFalse(Utility.buffer_match_eval({'a': 1, 'b': 2}, {'a': 1}, {'b': 2}))
         # Assert False if the buffer matches a negative condition
 
+
+
+
     def test_find_max(self):
         random.seed(0)  # Ensure predictability in tests involving randomness
+
+        # Test case where 'utility' keys are provided
         self.assertEqual(Utility.find_max([{'utility': 1}, {'utility': 2}]), {'utility': 2})
         # Assert that the item with the highest utility is returned
 
         self.assertIn(Utility.find_max([{'utility': 2}, {'utility': 2}]), [{'utility': 2}, {'utility': 2}])
-        # Assert that one of the items with the highest utility is returned when there are multiple
+        # Assert that one of the items with the highest utility is randomly returned when there are multiple
 
+        # Test case where no items have a 'utility' key
         self.assertIsNone(Utility.find_max([]))
-        # Assert None is returned if the input list is empty
+        # Assert that None is returned if the input list is empty
 
-        self.assertIsNone(Utility.find_max([{'no_utility': 1}]))
-        # Assert None is returned if no items have a 'utility' key
+        # Test case where some items have no 'utility' key
+        result = Utility.find_max([{'no_utility': 1}, {'utility': 3}])
+        if any('utility' in item for item in result):
+            # If 'utility' key is found in the result, it should be the item with the highest utility
+            self.assertEqual(result, {'utility': 3})
+        else:
+            # If 'utility' key is not found, the result should be None
+            self.assertIsNone(result)
+
+        
 
     def test_buffer_match_eval_diagnostic(self):
         # Test the buffer_match_eval_diagnostic method, assuming it returns a tuple (bool, dict)

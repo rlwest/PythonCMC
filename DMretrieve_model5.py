@@ -2,60 +2,66 @@
 import random
 
 from utility import Utility
+from Cognitive_Functions import match_chunks_with_diagnostics
 from production_cycle import ProductionCycle
-from Cog_Functions import DMHandler
 
 
 # Working Memory
 
 working_memory = {
-    'goalbuffer': {'goal': 'cat_name'}, 
-    'dmIN_buffer': {'process': 'DMretrieve', 'animal': 'cat', 'colour': 'white'},
+    'goalbuffer': {'goal': 'dog'}, 
+    'dmIN_buffer': {},
     'dmOUT_buffer': {}
 }
 
 # Other Memories
 
-DM = {
-    'chunk1': {'animal': 'cat', 'colour': 'brown', 'utility': 25},
-    'chunk2': {'animal': 'cat', 'colour': 'white', 'name': 'whitney', 'utility': 30},
-    'chunk3': {'animal': 'fish', 'colour': 'blue', 'utility': 15}
-    }
-
-# Cognitive Functions
-
-global dm_handler_for_cats
-dm_handler_for_cats = DMHandler(DM, 'dmIN_buffer', 'dmOUT_buffer')
+memory_system = {
+    'chunk1': {'type': 'task', 'status': 'complete', 'utility': 5},
+    'chunk2': {'type': 'task', 'status': 'incomplete', 'utility': 8},
+    'chunk3': {'type': 'event', 'status': 'upcoming', 'utility': 3}
+}
 
 
 # Main Production System
 
 PS1_list = []
-def request_name(working_memory):
-    dm_handler_for_cats.process_request(working_memory)
-    working_memory['goalbuffer']['goal'] = 'wait_for_name'
-    return 0
+def request_dm(working_memory):
+    buffer = memory_system
+    cue = {'matches': {'type': 'task'}, 'negations': {'status': 'complete'}}
+    
+    # Capture the return value of match_chunks_with_diagnostics
+    best_chunk_data = match_chunks_with_diagnostics(buffer, cue)
+    
+    # Now you can use best_chunk_data in the rest of your function
+    print("Retrieved best chunk data:", best_chunk_data)
+    
+    # Update the goal to reflect the new state
+    working_memory['goalbuffer']['goal'] = 'wait'
+    print("Current goal in the goalbuffer:", working_memory['goalbuffer']['goal'])
+
+    return 2
 PS1_list.append({
-    'matches': {'goalbuffer': {'goal': 'cat_name'}},
+    'matches': {'goalbuffer': {'goal': 'dog'}},
     'negations': {},
     'utility': 10,
-    'action': request_name,
+    'action': request_dm,
     'report': "PS1-Production1"
 })
 
-
 def report_name(working_memory):
-    print('##############name found#####################')
     return 0
 PS1_list.append({
-    'matches': {'dmOUT_buffer':{'animal':'cat','name':'*'}},
+    'matches': {'goalbuffer': {'goal': 'wait'}},
     'negations': {},
     'utility': 10,
     'action': report_name,
-    'report': "PS1-Production1"
+    'report': "PS1-Production2"
 })
 
 PS2_list = []
+
+
 
 # production system delays in ticks
 ProductionSystem1_Countdown=1

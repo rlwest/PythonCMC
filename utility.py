@@ -1,10 +1,9 @@
+"""
+these funcitons perform basic actions in the produciton system
+"""
+
+
 import random
-
-
-
-#####################
-##### these functions define the computational architecture
-#####################
 
 
 class Utility: # this class provides utility functions for matching and choosing chunks
@@ -63,6 +62,8 @@ class Utility: # this class provides utility functions for matching and choosing
         """
         return Utility.check_positive_matches(buffer_dict, matching_dict, wildcard) and Utility.check_negative_matches(buffer_dict, negation_dict)
 
+
+
     @staticmethod
     def find_max(match_list):
         """
@@ -71,26 +72,21 @@ class Utility: # this class provides utility functions for matching and choosing
             match_list (list): A list of items where each item is a dictionary containing at least a 'utility' key.
         Returns:
             dict: The item with the highest utility. If there are multiple items with the same highest utility,
-            one of them is returned randomly. Returns None if the list is empty or no items have a utility value.
+            one of them is returned randomly. Returns None if the input list is empty.
         """
-        highest_utility = float('-inf')
-        highest_utility_productions = []
-        for item in match_list:
-            utility = item.get('utility', float('-inf'))  # Retrieve the utility of the production.
-            if utility > highest_utility:
-                highest_utility = utility
-                highest_utility_productions = [item]
-            elif utility == highest_utility:
-                highest_utility_productions.append(item)
-        # Check if highest_utility was never updated from its initial value
-        # After processing all items, check if the highest utility was ever updated from
-        # its initial value (negative infinity). If not, it means no items had a valid 'utility' key,
-        # and therefore, None should be returned.
-        if highest_utility == float('-inf'):
-            return None  # Return None if no items have a 'utility' key
-        # Randomly choose one production if there are multiple productions with the highest utility.
-        return random.choice(highest_utility_productions) if highest_utility_productions else None
+        if not match_list:
+            return None  # Return None if the input list is empty
 
+        # Filter out items without the 'utility' key
+        items_with_utility = [item for item in match_list if 'utility' in item]
+
+        if not items_with_utility:
+            return random.choice(match_list)  # Return a random choice from the original input list
+
+        highest_utility = max(items_with_utility, key=lambda item: item['utility'])['utility']
+        highest_utility_productions = [item for item in items_with_utility if item['utility'] == highest_utility]
+
+        return random.choice(highest_utility_productions)
 
 
 
@@ -113,7 +109,7 @@ class Utility: # this class provides utility functions for matching and choosing
             # Check for a match
             #print(f"Checking match for key: {key} with value: {match_value}")
             if key not in buffer_dict or buffer_dict[key] != match_value:
-                print("Match failed!")
+                #print("Match failed!")
                 return False, {}
             #print("Match succeeded!")
 
@@ -122,7 +118,7 @@ class Utility: # this class provides utility functions for matching and choosing
             # Check for negation
             #print(f"Checking negation for key: {key} with value: {neg_value}")
             if key in buffer_dict and buffer_dict[key] == neg_value:
-                print("Negation failed!")
+                #print("Negation failed!")
                 return False, {}
             #print("Negation succeeded!")
 
@@ -143,9 +139,10 @@ class Utility: # this class provides utility functions for matching and choosing
                 matched_chunk_data = buffer_value.copy()  # Copy matching chunk data
                 matched_chunk_data.update(wildcard_values)  # Include wildcard values
                 matched_chunks_data.append(matched_chunk_data)  # Add to the list of matched chunks
-                print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
+                #print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
 
         # Select the best chunk based on utility
         best_chunk_data = Utility.find_max(matched_chunks_data)
         return best_chunk_data
 
+    

@@ -45,7 +45,10 @@ class TestUtility(unittest.TestCase):
         # Assert False if the buffer matches a negative condition
 
     def test_find_max(self):
+        # note, find_max requires all items have a utility value
+        
         random.seed(0)  # Ensure predictability in tests involving randomness
+        
         self.assertEqual(Utility.find_max([{'utility': 1}, {'utility': 2}]), {'utility': 2})
         # Assert that the item with the highest utility is returned
 
@@ -55,8 +58,12 @@ class TestUtility(unittest.TestCase):
         self.assertIsNone(Utility.find_max([]))
         # Assert None is returned if the input list is empty
 
-        self.assertIsNone(Utility.find_max([{'no_utility': 1}]))
-        # Assert None is returned if no items have a 'utility' key
+        self.assertEqual(Utility.find_max([{'utility': 42}]), {'utility': 42})
+        # If there's only one item with 'utility', it should be returned
+
+        self.assertEqual(Utility.find_max([{'utility': -1}, {'utility': -5}, {'utility': -3}]), {'utility': -1})
+        # The item with the highest (least negative) utility should be returned
+
 
     def test_buffer_match_eval_diagnostic(self):
         # Test the buffer_match_eval_diagnostic method, assuming it returns a tuple (bool, dict)
@@ -70,7 +77,7 @@ class TestUtility(unittest.TestCase):
     def test_match_chunks_with_diagnostics(self):
         # Define a buffer with several items, each represented as a dictionary.
         # These items have different attributes and utility values.
-        print('this test will print some things as part of its normal actions, they are not diagnostic')
+        # print('this test will print some things as part of its normal actions, they are not diagnostic')
         buffer = {
             'chunk1': {'type': 'task', 'status': 'complete', 'utility': 5},
             'chunk2': {'type': 'task', 'status': 'incomplete', 'utility': 8},

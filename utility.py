@@ -1,10 +1,9 @@
+"""
+these funcitons perform basic actions in the produciton system
+"""
+
+
 import random
-
-
-
-#####################
-##### these functions define the computational architecture
-#####################
 
 
 class Utility: # this class provides utility functions for matching and choosing chunks
@@ -110,7 +109,7 @@ class Utility: # this class provides utility functions for matching and choosing
             # Check for a match
             #print(f"Checking match for key: {key} with value: {match_value}")
             if key not in buffer_dict or buffer_dict[key] != match_value:
-                print("Match failed!")
+                #print("Match failed!")
                 return False, {}
             #print("Match succeeded!")
 
@@ -119,7 +118,7 @@ class Utility: # this class provides utility functions for matching and choosing
             # Check for negation
             #print(f"Checking negation for key: {key} with value: {neg_value}")
             if key in buffer_dict and buffer_dict[key] == neg_value:
-                print("Negation failed!")
+                #print("Negation failed!")
                 return False, {}
             #print("Negation succeeded!")
 
@@ -140,7 +139,7 @@ class Utility: # this class provides utility functions for matching and choosing
                 matched_chunk_data = buffer_value.copy()  # Copy matching chunk data
                 matched_chunk_data.update(wildcard_values)  # Include wildcard values
                 matched_chunks_data.append(matched_chunk_data)  # Add to the list of matched chunks
-                print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
+                #print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
 
         # Select the best chunk based on utility
         best_chunk_data = Utility.find_max(matched_chunks_data)

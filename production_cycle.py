@@ -1,4 +1,6 @@
-
+"""
+these functions are used to run the production system
+"""
 
 
 from utility import Utility
@@ -32,7 +34,7 @@ class ProductionCycle: # This class runs the production cycle
 
                 if is_match_for_all_buffers:
                     grouped_matched_productions[prod_system_key].append(production)
-                    print('PRODUCTION MATCHED')
+                    #print('PRODUCTION MATCHED')
                     print(f"Matched Production in {prod_system_key}: {production.get('report')}")
 
         return grouped_matched_productions
@@ -60,21 +62,21 @@ class ProductionCycle: # This class runs the production cycle
                 # Execute the action associated with the production
                 production['action'](working_memory)
                 report_info = production.get('report')
-                print(f'[ACTION TAKEN] Executing action for production {production.get("report")}.')
-                print(f'[REPORT] {report_info}')
+                print(f'[ACTION TAKEN] Execute action for production {production.get("report")}.')
+                #print(f'[REPORT] {report_info}')
                 
                 # Reset the delay for the production system to its original value
                 AllProductionSystems[prod_system_key][1] = DelayResetValues[prod_system_key]
-                print(f'[INFO] Delay for production system {prod_system_key} reset to original value.')
+                #print(f'[INFO] Delay for production system {prod_system_key} reset to original value.')
 
                 # Remove the action from pending actions
                 del self.pending_actions[i]
             else:
                 # If the delay is not yet completed, decrement it
                 self.pending_actions[i] = (prod_system_key, production, delay - 1)
-                print(f'[INFO] Delay for action in production {production.get("report")} decremented. Remaining delay: {delay - 1}')
+                #print(f'[INFO] Delay for action in production {production.get("report")} decremented. Remaining delay: {delay - 1}')
 
-    
+
         
 
     def filter_and_execute_productions(self, grouped_productions, working_memory, AllProductionSystems, DelayResetValues):
@@ -96,7 +98,7 @@ class ProductionCycle: # This class runs the production cycle
             
             if highest_utility_production:
                 # Reporting the selected production
-                print(f"[INFO] Production System '{prod_system_key}' selected production: '{highest_utility_production.get('report')}'")
+                #print(f"[INFO] Production System '{prod_system_key}' selected production: '{highest_utility_production.get('report')}'")
 
                 # Execute the action associated with the selected production
                 delay = highest_utility_production['action'](working_memory)
@@ -110,7 +112,7 @@ class ProductionCycle: # This class runs the production cycle
                     report_info = highest_utility_production.get('report')
                     print('[ACTION TAKEN] ' + report_info)
                     AllProductionSystems[prod_system_key][1] = DelayResetValues[prod_system_key]
-                    print(f"[INFO] Production System '{prod_system_key}' delay reset to its original value.")
+                    #print(f"[INFO] Production System '{prod_system_key}' delay reset to its original value.")
 
 
 
@@ -120,11 +122,11 @@ class ProductionCycle: # This class runs the production cycle
         """
 
         # Process any actions that are pending from previous cycles
-        print("[INFO] Processing pending actions.")
+        #print("[INFO] Processing pending actions.")
         self.process_pending_actions(working_memory, AllProductionSystems, DelayResetValues)
 
         # The matched_productions dictionary is already grouped by production system keys
-        print("[INFO] Filtering and executing matched productions.")
+        #print("[INFO] Filtering and executing matched productions.")
         self.filter_and_execute_productions(matched_productions, working_memory, AllProductionSystems, DelayResetValues)
 
 

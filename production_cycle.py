@@ -1,9 +1,14 @@
 class ProductionCycle:
+
+
+
     def match_productions(self, memories, AllProductionSystems):
         matched_productions = {}
+
         for prod_system_key, prod_system in AllProductionSystems.items():
             productions = prod_system[0]
             matched_productions[prod_system_key] = []
+
             for production in productions:
                 matches = production['matches']
                 negations = production['negations']
@@ -11,14 +16,14 @@ class ProductionCycle:
                 match_found = True
                 for memory_store, conditions in matches.items():
                     memory = memories.get(memory_store, {})
-                    print(f"Checking matches in {memory_store}: {memory}")
+                    #print(f"Checking matches in {memory_store}: {memory}")
                     for buffer, slots in conditions.items():
                         for slot, value in slots.items():
                             actual_value = memory.get(buffer, {}).get(slot, None)
-                            print(f"Checking {memory_store} -> {buffer}.{slot} == {value}, actual: {actual_value}")
+                            #print(f"Checking {memory_store} -> {buffer}.{slot} == {value}, actual: {actual_value}")
                             if actual_value != value:
                                 match_found = False
-                                print(f"Match failed: {memory_store} -> {buffer}.{slot} (expected: {value}, actual: {actual_value})")
+                                #print(f"Match failed: {memory_store} -> {buffer}.{slot} (expected: {value}, actual: {actual_value})")
                                 break
                         if not match_found:
                             break
@@ -31,14 +36,14 @@ class ProductionCycle:
                 negation_found = False
                 for memory_store, conditions in negations.items():
                     memory = memories.get(memory_store, {})
-                    print(f"Checking negations in {memory_store}: {memory}")
+                    #print(f"Checking negations in {memory_store}: {memory}")
                     for buffer, slots in conditions.items():
                         for slot, value in slots.items():
                             actual_value = memory.get(buffer, {}).get(slot, None)
-                            print(f"Checking {memory_store} -> {buffer}.{slot} != {value}, actual: {actual_value}")
+                            #print(f"Checking {memory_store} -> {buffer}.{slot} != {value}, actual: {actual_value}")
                             if actual_value == value:
                                 negation_found = True
-                                print(f"Negation found: {memory_store} -> {buffer}.{slot} == {value}")
+                                #print(f"Negation found: {memory_store} -> {buffer}.{slot} == {value}")
                                 break
                         if negation_found:
                             break

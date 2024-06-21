@@ -14,7 +14,6 @@ def count_0(working_memory):
     print("Executing count_0")
     working_memory['focusbuffer']['focus'] = 'one'
     print(f"Updated working_memory: {working_memory}")
-    return 0
 ProceduralProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'focus': 'zero'}}},
     'negations': {},
@@ -26,9 +25,8 @@ ProceduralProductions.append({
 def count_1(working_memory):
     print("Executing count_1")
     working_memory['focusbuffer']['focus'] = 'two'
-    return 0
 ProceduralProductions.append({
-    'matches': {'working_memory': {'focusbuffer': {'focus': 'zero'},'motorbuffer': {'do': 'nothing'}}},
+    'matches': {'working_memory': {'focusbuffer': {'focus': 'one'}}},
     'negations': {},
     'utility': 10,
     'action': count_1,
@@ -39,7 +37,6 @@ def count_2(working_memory):
     print("Executing count_2")
     working_memory['focusbuffer']['focus'] = 'three'
     print(f"Updated working_memory: {working_memory}")
-    return 0
 ProceduralProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'focus': 'two'}}},
     'negations': {},
@@ -53,7 +50,6 @@ MotorProductions = []
 def button_1(environment_memory):
     environment_memory['button1']['state'] = 'down'
     print(f"Updated environment_memory: {environment_memory}")
-    return 0
 MotorProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'focus': 'zero'}}},
     'negations': {},
@@ -65,7 +61,6 @@ MotorProductions.append({
 def button_2(environment_memory):
     print("Executing button_2")
     environment_memory['button2']['state'] = 'down'
-    return 0
 MotorProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'focus': 'one'}}},
     'negations': {},
@@ -78,7 +73,6 @@ def button_3(environment_memory):
     print("Executing button_3")
     environment_memory['button3']['state'] = 'down'
     print(f"Updated environment_memory: {environment_memory}")
-    return 0
 MotorProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'focus': 'two'}}},
     'negations': {},
